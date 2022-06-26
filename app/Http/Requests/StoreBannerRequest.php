@@ -27,7 +27,7 @@ class StoreBannerRequest extends FormRequest
             'title' => "required|string",
             
             'picture' => "required|mimes:jpg,jpeg,png",
-            'order' => "required|integer|between:1,9|unique"
+            'order' => "required|integer|between:1,9|unique:banners,order"
         ];
     }
 }

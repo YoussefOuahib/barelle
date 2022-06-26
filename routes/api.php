@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth:sanctum', 'verified']], function () {
 
 
     });
+    
     Route::get('/settings', 'SettingsController@index');
 
 Route::group(['middleware' => ['admin']], function () {
@@ -80,11 +81,6 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/admin/orders/{order}', 'Admin\OrdersController@show');
 
     Route::put('/admin/orders/{order}', 'Admin\OrdersController@update');
-
-
-
-  
-    
 
 
     });

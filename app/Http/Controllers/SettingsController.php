@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Resources\SettingsResource;
 use App\Models\Setting;
 use Carbon\Carbon;
-use App\Http\Resources\SettingsResource;
-use App\Http\Resources\SettingsCollection;
+use Illuminate\Http\Request;
 use Image;
+
 class SettingsController extends Controller
 {
-    public function store(Request $request) {
-        if($request->logo) {
-        $logo = Carbon::now()->timestamp.'.'.$request->logo->extension();
+    public function store(Request $request)
+    {
+        if ($request->logo) {
+            $logo = Carbon::now()->timestamp . '.' . $request->logo->extension();
 
-        $location = public_path('storage/products/' . $logo);
-        Image::make($request->logo)->resize(500,200)->save($location);
+            $location = public_path('storage/products/' . $logo);
+            Image::make($request->logo)->resize(500, 200)->save($location);
 
+        } else {
+            $logo;
         }
-        else {
-        $logo;
-        }
-         $setting = Setting::updateOrCreate([
+        $setting = Setting::updateOrCreate([
             'name' => $request->name,
             'address' => $request->address,
             'phone_number' => $request->phone_number,
@@ -37,11 +37,11 @@ class SettingsController extends Controller
         return response()->json(['status' => 201]);
 
     }
-    public function index() {
+    public function index()
+    {
         $settings = Setting::first();
         return response([
             'settings' => new SettingsResource($settings),
-         
 
         ], 201);
     }

@@ -141,7 +141,7 @@ class BannerController extends Controller
         if($request->file('picture')){
         $imageName = Carbon::now()->timestamp.'.'. $request->picture->extension();
         
-        $request->picture->move(public_path('banners'), $picture);
+        $request->picture->move(public_path('banners'), $imageName);
      
         }
         $banner->update([

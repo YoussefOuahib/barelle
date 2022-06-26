@@ -1,29 +1,26 @@
 <?php
 
 namespace App\Http\Controllers;
-use Carbon\Carbon;
-use Image;
-use Illuminate\Support\Facades\DB;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Subcategory;
-use App\Models\Attribute;
-use App\Models\AttributeValue;
-use Illuminate\Http\Request;
-use Illuminate\Support\File;
-use Illuminate\Support\Str;
+
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
-use App\Http\Resources\ProductCollection;
-use App\Http\Resources\CategoryCollection;
-use App\Http\Resources\SubcategoryCollection;
 use App\Http\Resources\AttributeCollection;
 use App\Http\Resources\AttributeValueCollection;
-use App\Http\Resources\AttributeValueResource;
-use App\Http\Resources\GalleryCollection;
-use App\Http\Resources\GalleryResource;
+use App\Http\Resources\CategoryCollection;
+use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\SubcategoryCollection;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
+use App\Models\Category;
 use App\Models\Gallery;
+use App\Models\Product;
+use App\Models\Subcategory;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Image;
+
 class ProductController extends Controller
 {
     /**
@@ -35,42 +32,32 @@ class ProductController extends Controller
     {
         $search = request('search');
         $category = request('showByCategory');
-        if (request('filterBy') == 0 ) {
+        if (request('filterBy') == 0) {
             $sort_field = 'created_at';
             $sort_direction = 'DESC';
-
-        }
-        elseif (request('filterBy') == 1) {
+        } elseif (request('filterBy') == 1) {
             $sort_field = 'created_at';
             $sort_direction = 'ASC';
+        } elseif (request('filterBy') == 2) {
 
-        }
-     
-        elseif (request('filterBy') == 2) {
-            
             $products = Product::withCount('order')->orderBy('order_count', 'desc')
-            ->where('name', 'LIKE', '%' . $search . '%' )
-            ->when($category, function ($query, $category) {
-                $query->where('category_id', $category);
-            })->paginate(10);
-        }
-        elseif (request('filterBy') == 3) {
+                ->where('name', 'LIKE', '%' . $search . '%')
+                ->when($category, function ($query, $category) {
+                    $query->where('category_id', $category);
+                })->paginate(10);
+        } elseif (request('filterBy') == 3) {
             $sort_field = 'sale_price';
             $sort_direction = 'ASC';
-
-        }
-        elseif (request('filterBy') == 4) {
+        } elseif (request('filterBy') == 4) {
             $sort_field = 'sale_price';
             $sort_direction = 'DESC';
-
         }
-        if(request('filterBy') != 2) {
+        if (request('filterBy') != 2) {
             $products = Product::orderBy($sort_field, $sort_direction)
-            ->where('name', 'LIKE', '%' . $search . '%' )
-            ->when($category, function ($query, $category) {
-                $query->where('category_id', $category);
-            })->paginate(10);
-
+                ->where('name', 'LIKE', '%' . $search . '%')
+                ->when($category, function ($query, $category) {
+                    $query->where('category_id', $category);
+                })->paginate(10);
         }
         $categories = Category::all();
         $subcategories = Subcategory::all();
@@ -81,7 +68,6 @@ class ProductController extends Controller
             'attributes' => new AttributeCollection($attributes),
         ]);
     }
-   
 
     /**
      * Show the form for creating a new resource.
@@ -101,10 +87,9 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $imageName = Carbon::now()->timestamp.'.'.$request->image->extension();
-
-        $request->image->move(public_path('products'), $imageName);
-
+        $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
+        $location = public_path('storage/products/' . $imageName);
+        Image::make($request->image)->resize(600, 600)->save($location);
 
         $product = Product::create([
             'category_id' => $request->category,
@@ -121,58 +106,49 @@ class ProductController extends Controller
 
         ]);
 
-        if($request->gallery){
+        if ($request->gallery) {
             $imgsName = "";
-            foreach($request->gallery as $key => $image){
+            foreach ($request->gallery as $key => $image) {
+                $imgName = Carbon::now()->timestamp . $key . '.' . $image->extension();
 
+                $location = public_path('storage/products/' . $imgName);
+                Image::make($image)->resize(600, 600)->save($location);
 
-               
-                $imgName = Carbon::now()->timestamp. $key .'.'.$image->extension();
-                $image->move(public_path('products'), $imgName);
-
-                
-                if($key == 0){
+                if ($key == 0) {
                     $imgsName = $imgName;
-
                 }
                 $gallery = Gallery::create([
                     'product_id' => $product->id,
                     'image' => $imgName,
                 ]);
-
             }
-            
         }
-     
-     
-       if($request->attrs) {
-        $attrs = explode(',', $request->attrs);
-        $values = json_decode($request->values);
-        $prices = json_decode($request->prices);
 
-        foreach($attrs as $key => $myattr) {
-       
-            $prod_attr = Attribute::where('name',$myattr)->first()->id;
-           
-            
-           foreach($values[$key] as $k => $value) {
-            
-               $attribute = AttributeValue::create([
-                   'product_id' => $product->id,
-                   'attribute_id' => $prod_attr,
-                   'value' => $value,
-                   'price_variation' => $prices[$key][$k],
-         
-                   
-               ]);
-           }
+        if ($request->attrs) {
+            $attrs = explode(',', $request->attrs);
+            $values = json_decode($request->values);
+            $prices = json_decode($request->prices);
+
+            foreach ($attrs as $key => $myattr) {
+
+                $prod_attr = Attribute::where('name', $myattr)->first()->id;
+
+                foreach ($values[$key] as $k => $value) {
+
+                    $attribute = AttributeValue::create([
+                        'product_id' => $product->id,
+                        'attribute_id' => $prod_attr,
+                        'value' => $value,
+                        'price_variation' => $prices[$key][$k],
+
+                    ]);
+                }
+            }
         }
-    }
-    
+
         return response([
             'product' => new ProductResource($product),
-           
-        
+
         ], 201);
     }
 
@@ -186,17 +162,11 @@ class ProductController extends Controller
     {
         $attribute_value = AttributeValue::where('product_id', $product->id)->get();
 
-        
         return response([
             'product' => new ProductResource($product),
             'attributes' => new AttributeValueCollection($attribute_value),
-            
-            
-            
-            
-        
-        
-        ], 201); 
+
+        ], 201);
     }
 
     /**
@@ -207,7 +177,6 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        
     }
 
     /**
@@ -220,16 +189,16 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $imageName = $product->image;
-        $path = public_path().'/storage/products';
-       
-        if($request->file('image')){
-        $imageName = Carbon::now()->timestamp.'.'. $request->image->extension();
+        $path = public_path() . '/storage/products';
 
-        $request->image->move(public_path('products'), $imageName);
-     
+        if ($request->file('image')) {
+            $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
+            $location = public_path('storage/products/' . $imageName);
+            Image::make($request->image)->resize(600, 600)->save($location);
+
         }
         $product->update([
-            'category_id' =>  $request->category,
+            'category_id' => $request->category,
             'subcategory_id' => $request->subcategory,
             'name' => $request->name,
             'slug' => Str::slug($request->name),
@@ -240,63 +209,50 @@ class ProductController extends Controller
             'shipping_fee' => $request->shipping_fee,
             'status' => $request->status,
             'image' => $imageName,
-            
+
         ]);
-        
-        
-        if($request->file('gallery')){
+
+        if ($request->file('gallery')) {
             $imgsName = "";
-            foreach($request->gallery as $key => $image){
+            foreach ($request->gallery as $key => $image) {
+                $imgName = Carbon::now()->timestamp . $key . '.' . $image->extension();
+
+                $location = public_path('storage/products/' . $imgName);
+                Image::make($image)->resize(600, 600)->save($location);
 
 
-               
-                $imgName = Carbon::now()->timestamp. $key .'.'.$image->extension();
-                
-
-                $image->move(public_path('products'), $imgName);
-
-                
-                if($key == 0){
+                if ($key == 0) {
                     $imgsName = $imgName;
-
                 }
                 $gallery = Gallery::create([
                     'product_id' => $product->id,
                     'image' => $imgName,
                 ]);
-
             }
         }
 
-     
-       
-       if($request->attrs) {
-        $attrs = explode(',', $request->attrs);
-        $values = json_decode($request->values);
-        $prices = json_decode($request->prices);
-        $attribute = AttributeValue::where('product_id', $product->id)->delete();
+        if ($request->attrs) {
+            $attrs = explode(',', $request->attrs);
+            $values = json_decode($request->values);
+            $prices = json_decode($request->prices);
+            $attribute = AttributeValue::where('product_id', $product->id)->delete();
 
-        foreach($attrs as $key => $myattr) {
-       
-            $prod_attr = Attribute::where('name',$myattr)->first()->id;
-            foreach($values[$key] as $k => $value) {
-            
-               AttributeValue::create([
-                'product_id' => $product->id,
-                'attribute_id' => $prod_attr,
-                'value' => $value,
-                'price_variation' => $prices[$key][$k],
-               ]);
+            foreach ($attrs as $key => $myattr) {
+
+                $prod_attr = Attribute::where('name', $myattr)->first()->id;
+                foreach ($values[$key] as $k => $value) {
+
+                    AttributeValue::create([
+                        'product_id' => $product->id,
+                        'attribute_id' => $prod_attr,
+                        'value' => $value,
+                        'price_variation' => $prices[$key][$k],
+                    ]);
+                }
             }
-            
-          
         }
-    }
-    
-    
 
-       return response()->json(['status' => 201]);
-
+        return response()->json(['status' => 201]);
     }
 
     /**
@@ -307,31 +263,28 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        
+
         $attrs = AttributeValue::where('product_id', $product->id)->get();
         $gallery = Gallery::where('product_id', $product->id)->get();
         $product->delete();
         $product->forcedelete();
         $product->deleteimage();
-        if($attrs){
-        foreach ($attrs as $attr) {
-            $attr->delete();
-           
+        if ($attrs) {
+            foreach ($attrs as $attr) {
+                $attr->delete();
+            }
         }
-    }
-        if($gallery){
+        if ($gallery) {
             foreach ($gallery as $img) {
                 $img->delete();
-               
             }
-    }
+        }
         return response()->json(['status' => 201]);
-    
-}
-    public function removeImage($id){
+    }
+    public function removeImage($id)
+    {
         $gallery = Gallery::find($id);
         $gallery->delete();
         return response()->json(['status' => 201]);
-
     }
 }

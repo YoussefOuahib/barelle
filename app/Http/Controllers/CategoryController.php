@@ -17,7 +17,7 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
- 
+
     public function index()
     {
         $categories = Category::paginate(10);
@@ -42,7 +42,7 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        $imageName = Carbon::now()->timestamp.'.'.$request->image->extension();
+        $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
         /*
         $location = public_path('storage/products/' . $imageName);
         Image::make($request->image)->resize(600,600)->save($location);
@@ -88,13 +88,12 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-  
-       
-        if($request->file('image')){
-        $imageName = Carbon::now()->timestamp.'.'. $request->image->extension();
 
-        $request->image->move(public_path('products'), $imageName);
-     
+
+        if ($request->file('image')) {
+            $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
+
+            $request->image->move(public_path('products'), $imageName);
         }
         $category->update([
             'image' => $imageName,
@@ -111,12 +110,11 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        if($category->subcategories->count() == 0) {
-        $category->delete();
-        return response()->json(['status' => 201]);
-        }else {
+        if ($category->subcategories->count() == 0) {
+            $category->delete();
+            return response()->json(['status' => 201]);
+        } else {
             return response()->json(['status' => 301]);
-
         }
     }
 }

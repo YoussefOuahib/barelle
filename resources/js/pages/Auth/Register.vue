@@ -5,6 +5,14 @@
         <div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
+				<div v-for="(v, k) in errors" :key="k" >
+				<div v-for="error in v" :key="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+				{{error}}hello
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+						</button>
+						</div>
+						</div>
 					<span class="login100-form-title p-b-26">
 						Create your account
 					</span>
@@ -51,7 +59,8 @@
 
 						
 					<router-link class="txt2" :to="{ name: 'login' }">
-					Login</router-link>
+					Login
+					</router-link>
 
 					</div>
 				
@@ -72,8 +81,7 @@ export default {
 			message: '',
 			logged: JSON.parse(localStorage.getItem('logged')) || false,
             user: {name: "", email: "", phone: "", password: ""},
-			
-
+			errors : '',
         }
     },
 	beforeRouteEnter(to, from, next) {
@@ -95,18 +103,17 @@ export default {
 				localStorage.setItem('logged', true);
 
 				  Swal.fire(
-  'Done',
-  this.message,
-  'success'
-)
-				
-				
-                this.$router.go({name: 'home'});
-
-            
-            }).catch(err => console.log(err));
-			});
-			}
+					'Done',
+					this.message,
+					'success'
+					)
+					this.$router.go({name: 'home'});
+					}).catch(err => {
+						this.errors = err.res.errors;
+						console.log(this.errors);
+						});
+						});
+						}
         }
 		
 	}

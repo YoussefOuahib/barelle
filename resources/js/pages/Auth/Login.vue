@@ -4,18 +4,17 @@
     <div>
         <div class="limiter">
 		<div class="container-login100">
+			
 			<div class="wrap-login100">
-					<span class="login100-form-title p-b-26">
-						Login 
-					</span>
-					<span class="login100-form-title p-b-48">
-						<i class="zmdi zmdi-font"></i>
-					</span>
-
-					<div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
-						<input class="input100" type="text" v-model="user.email">
-						<span class="focus-input100" data-placeholder="Email"></span>
-					</div>
+				
+						<span class="login100-form-title p-b-26">Login </span>
+						<span class="login100-form-title p-b-48">
+							<i class="zmdi zmdi-font"></i>
+							</span>
+							<div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
+								<input class="input100" type="text" v-model="user.email">
+								<span class="focus-input100" data-placeholder="Email"></span>
+							</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
 						<span class="btn-show-pass">
@@ -58,9 +57,11 @@ export default {
         return {
 			message: '',
 			logged: JSON.parse(localStorage.getItem('logged')) || false,
-            user: {email: "", password: ""}
+            user: {email: "", password: ""},
+			errors : '',
         }
     },
+
 	beforeRouteEnter(to, from, next) {
         if (JSON.parse(localStorage.getItem('logged'))) {
             return next('home');
@@ -71,42 +72,38 @@ export default {
 	methods: {
 		login() {
 			axios.get('/sanctum/csrf-cookie').then(response => {
-  
 
 			axios.post('api/login', this.user)
 			.then(res => {
+
 				if(res.data.logged == true) {
-					console.log(res.data.logged);
+
 					this.message = res.data.message;
 					localStorage.setItem('logged', JSON.stringify(true));
 					localStorage.setItem('admin', JSON.stringify(res.data.isAdmin));
 					localStorage.setItem('name',JSON.stringify(res.data.name));					
 					this.$router.go({name: 'home'});
 
-				}
-				else {
-					
+				}else {
+
 					this.message = response.data.message;
 					Swal.fire({
-  icon: 'error',
-  title: 'Oops...',
-  text: this.message,
- 
-})
-     
-					this.user = {email: "", password: ""};
-
-					setTimeout(() => {
-						this.message = '';
-					}, 2000)
-				}
-			}).catch(err => console.log(err));
-			});
-			
-		}
-	}
-  
-}
+						icon: 'error',
+						title: 'Oops...',
+						text: this.message,
+						})
+						this.user = {email: "", password: ""};
+						setTimeout(() => {
+							this.message = '';
+							}, 2000)
+							}
+							}).catch(err => {
+								this.errors = err.data.errors
+							});
+							});
+							}
+							}
+							}
 </script>
 <style scoped>
   @import '../../assets/login/css/main.css';

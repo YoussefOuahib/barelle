@@ -45,7 +45,7 @@
            <label for="image" class="myimg">
 
  
-    <img style="cursor:pointer;margin: 0 auto;" :src="'/products/' + this.previewImg" height="150px" width="150px">
+    <img style="cursor:pointer;margin: 0 auto;" :src="'/storage/products/' + this.previewImg" height="150px" width="150px">
 
 
 
