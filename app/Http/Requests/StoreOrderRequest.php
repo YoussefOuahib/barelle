@@ -27,7 +27,7 @@ class StoreOrderRequest extends FormRequest
             'first_name' => 'required|string|max:25',
             'last_name' => 'required|string|max:25',
             'email' => 'required|email',
-            'phone' => 'required|number|min:9|max:14'
+            'phone' => 'required|min:9|max:14'
         ];
     }
 }

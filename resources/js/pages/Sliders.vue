@@ -23,7 +23,7 @@
   <tbody>
      <tr v-for="slider in sliders.data" :key="slider.id">
    
-      <td class="slider-pic"><img width="100px" height="100px" :src="'/storage/sliders/' + slider.picture" alt=""></td>
+      <td class="slider-pic"><img width="100px" height="100px" :src="'/storage/images/' + slider.picture" alt=""></td>
        <td>{{slider.title}}</td>
        <td>{{slider.link}}</td>
        

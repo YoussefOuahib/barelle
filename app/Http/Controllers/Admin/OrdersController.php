@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Order;
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
+use App\Models\Order;
+use Illuminate\Http\Request;
+
 class OrdersController extends Controller
 {
     public function index()
@@ -16,17 +17,15 @@ class OrdersController extends Controller
         $status = request('status');
 
         $sort_field = 'created_at';
-            $sort_direction = 'DESC';
-  
-        if($filterTotal == 0) {
+        $sort_direction = 'DESC';
+
+        if ($filterTotal == 0) {
             $sort_field = 'total';
             $sort_direction = 'ASC';
-        }
-        elseif($filterTotal == 1) {
+        } elseif ($filterTotal == 1) {
             $sort_field = 'total';
             $sort_direction = 'DESC';
-        }
-        elseif($filterTotal == 2) {
+        } elseif ($filterTotal == 2) {
             $sort_field = 'created_at';
             $sort_direction = 'DESC';
         }
@@ -36,10 +35,6 @@ class OrdersController extends Controller
             $query->where('status', $status);
         })->orderBy($sort_field, $sort_direction)->paginate(10);
         return new OrderCollection($orders);
-
-        
-
-
 
     }
     public function update(Request $request, Order $order)
@@ -51,7 +46,8 @@ class OrdersController extends Controller
         ]);
         return response()->json(['status' => 201]);
     }
-    public function show(Order $order) {
+    public function show(Order $order)
+    {
         return new OrderResource($order);
     }
 }

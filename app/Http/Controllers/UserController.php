@@ -23,17 +23,20 @@ class UserController extends Controller
             'password' => $request->password,
         ];
 
-        $user = User::where('email', $request->email)->first();
         $remember_me = true;
-        if ($user->isAdmin()) {
-            $admin = true;
-        } else {
-            $admin = false;
-        }
+
         if (Auth::attempt($credentials, $remember_me)) {
+            $user = User::where('email', $request->email)->first();
+
             $token = $user->createToken('auth_token')->plainTextToken;
+
             $request->session()->regenerate();
-            return response()->json(['message' => 'Login Successful', 'logged' => true, 'isAdmin' => $admin, 'name' => $user->name], 200);
+            if ($user->isAdmin()) {
+                $admin = true;
+            } else {
+                $admin = false;
+            }
+            return response()->json(['message' => 'Login Successful', 'logged' => true, 'isAdmin' => true, 'name' => $user->name], 200);
         } else {
             return response()->json(['message' => 'Invalid Credentials']);
         }
@@ -63,7 +66,6 @@ class UserController extends Controller
     {
         auth()->user()->tokens()->delete();
         Session::flush();
-
         return response()->json(['message' => 'Logged Out'], 200);
     }
 }

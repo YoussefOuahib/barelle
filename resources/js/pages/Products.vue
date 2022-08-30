@@ -347,8 +347,8 @@
               <div>
                 <label for="image1" class="myimg">
 
-                  <img v-if="this.prv != ''" style="cursor:pointer; margin: 0 auto"
-                    :src="'/storage/products/' + this.prv" height="150px" width="150px">
+                  <img v-if="this.prv != ''" style="cursor:pointer; margin: 0 auto" :src="'/storage/images/' + this.prv"
+                    height="150px" width="150px">
                   <img v-else style="cursor:pointer; margin: 0 auto"
                     :src="this.previewImg != '' ? this.previewImg : 'https://www.aaronfaber.com/wp-content/uploads/2017/03/product-placeholder-wp.jpg'"
                     height="150px" width="150px">
@@ -385,7 +385,7 @@
               <div id="wrapper-update-footer" class=" wrapper-update-footer">
 
                 <div v-for="(img, index) in this.product.gallery" :key="img.id" class="wrapper-images">
-                  <img style="border-radius: 10px" :src="'/storage/products/' + img.image" height="70px" width="70px">
+                  <img style="border-radius: 10px" :src="'/storage/images/' + img.image" height="70px" width="70px">
 
                   <button @click="removeExistingImage(img.id, index)"><i class="fa-solid fa-trash"></i></button>
                 </div>
@@ -526,10 +526,6 @@ export default {
       showByCategory: '',
       showBySubcategory: 0,
       search: '',
-
-
-
-
     }
   },
   methods: {
@@ -584,8 +580,8 @@ export default {
 
     handleOnChange(e) {
       this.prv = '',
-        this.previewImg = '',
-        this.product.image = '';
+      this.previewImg = '',
+      this.product.image = '';
       if (e.target.files[0]) {
         this.product.image = e.target.files[0];
         this.previewImg = URL.createObjectURL(this.product.image);
@@ -628,17 +624,10 @@ export default {
       for (let x = 0; x < event.target.files.length; x++) {
 
         this.updatedGallery.push(event.target.files[x]);
-
         this.previews.push(URL.createObjectURL(event.target.files[x]));
 
-
       }
-
-
     },
-
-
-
     getProducts(page = 1) {
 
       axios.get('/api/products?page=' + page
@@ -650,7 +639,6 @@ export default {
         this.products = res.data;
         this.categories = res.data.categories;
         this.attributes = res.data.attributes;
-        console.log(this.categories);
       }).catch(err => console.log(err));
     },
 
@@ -664,15 +652,8 @@ export default {
           this.product = res.data.product;
           this.prv = this.product.image;
           this.gallery = res.data.gallery;
-
           this.atts = res.data.attributes;
-          console.log(this.atts.attribute.toString());
-
           this.handleAttributes();
-
-
-
-
 
         }).catch(error => console.log(error));
 
@@ -689,14 +670,10 @@ export default {
       console.log(this.attrs);
       for (let x = 0; x < this.prices.length; x++) {
         this.prcs[x] = this.prices[x].toString().split(',');
-
       }
       for (let i = 0; i < this.values.length; i++) {
         this.vals[i] = this.values[i].toString().split(',');
-
       }
-
-
       updateformData.append('attrs', this.attrs);
       updateformData.append('values', JSON.stringify(this.vals));
       updateformData.append('prices', JSON.stringify(this.prcs));
@@ -720,11 +697,6 @@ export default {
       }
 
       updateformData.append("_method", "put");
-
-
-
-
-
       axios.post(`/api/products/${this.product.slug}`, updateformData, config).then(res => {
         if (res.data.status == 201) {
           Swal.fire(
@@ -760,7 +732,6 @@ export default {
 
       for (let i = 0; i < this.values.length; i++) {
         this.vals[i] = this.values[i].split(',');
-
       }
       for (let x = 0; x < this.prices.length; x++) {
         this.prcs[x] = this.prices[x].split(',');
@@ -783,8 +754,6 @@ export default {
         for (let i = 0; i < this.gallery.length; i++) {
           let file = this.gallery[i];
           formData.append('gallery[' + i + ']', file);
-
-
         }
       }
 
@@ -837,8 +806,6 @@ export default {
         }
       }).catch(err => console.log(err));
     },
-
-
   },
   watch: {
     filterBy: function () {
@@ -851,7 +818,6 @@ export default {
     },
     showByCategory: function () {
       this.getProducts()
-
     }
   },
 

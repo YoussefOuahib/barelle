@@ -37,7 +37,7 @@
                             <div class="brand">
                                 <router-link :to="{ name: 'home' }">
                                     <img :src="
-                                        '/storage/products/' +
+                                        '/storage/images/' +
                                         this.settings.logo
                                     " width="150px" height="80px" />
                                 </router-link>
@@ -479,6 +479,7 @@ export default {
         Checkout() {
             this.$router.push({ name: "checkout" });
         },
+        
 
         logout() {
             axios.get("/sanctum/csrf-cookie").then((response) => {
@@ -510,9 +511,7 @@ export default {
             this.search();
         },
     },
-    created() {
-        cartHelper.viewCart();
-    },
+   
 };
 </script>
 <style scoped>

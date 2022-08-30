@@ -3,7 +3,7 @@
     <section class="slider">
       <VueSlickCarousel v-bind="carousel">
         <div v-for="slider in sliders" :key="slider.id">
-          <img :src="'storage/sliders/' + slider.picture" width="100%" height="350px">
+          <img :src="'storage/images/' + slider.picture" width="100%" height="350px">
         </div>
 
       </VueSlickCarousel>
@@ -82,7 +82,7 @@
               <div class="thumb-wrapper">
                 <div class="img-box">
                   <router-link :to="{ name: 'product', params: { slug: product.slug } }">
-                    <img :src="'storage/products/' + product.image" class="img-fluid" alt="">
+                    <img :src="'storage/images/' + product.image" class="img-fluid" alt="">
                   </router-link>
                 </div>
                 <div class="thumb-content">
@@ -110,14 +110,14 @@
 
     <div class="container my-4">
       <div class="row mt-2 g-4">
-        <div class="col-md-3" v-for="category in categories.slice(0.8)" :key="category.id">
+        <div class="col-md-3" v-for="category in mycategories" :key="category.id">
           <div class="card p-1">
             <router-link :to="{ name: 'browseByCategory', params: { category: category.id } }">
               <div class="d-flex justify-content-between align-items-center p-2">
                 <div class="flex-column lh-1 imagename"> {{ category.name }} </div>
 
 
-                <div> <img :src="'storage/products/' + category.image" height="100" width="100" /> </div>
+                <div> <img :src="'storage/images/' + category.image" height="100" width="100" /> </div>
 
               </div>
             </router-link>
@@ -151,11 +151,11 @@
           <div v-for="(product, index) in best_selling" :key="index" v-if="index < 8"
             class="col-lg-3 col-md-6 col-sm-6 col-6">
             <div class="wsk-cp-product">
-             <router-link :to="{ name: 'product', params: { slug: product.slug } }">
+              <router-link :to="{ name: 'product', params: { slug: product.slug } }">
 
-              <div class="wsk-cp-img"><img :src="'storage/products/' + product.image" alt="Product"
-                  class="img-responsive" /></div>
-                  </router-link>
+                <div class="wsk-cp-img"><img :src="'storage/images/' + product.image" alt="Product"
+                    class="img-responsive" /></div>
+              </router-link>
               <div class="wsk-cp-text">
                 <div class="category">
                   <span>{{ product.subcategory }}</span>
@@ -163,15 +163,15 @@
                 <div class="title-product">
                   <router-link :to="{ name: 'product', params: { slug: product.slug } }">
 
-                  <h3>{{ product.name }} </h3>
+                    <h3>{{ product.name }} </h3>
                   </router-link>
                 </div>
 
                 <div class="card-footer">
                   <router-link :to="{ name: 'product', params: { slug: product.slug } }">
-                  <div class="wcf-left"><span class="price">{{ product.sale_price }}MAD</span>
-                    <span class="text-decoration-line-through text-muted">{{ product.regular_price }}MAD</span>
-                  </div>
+                    <div class="wcf-left"><span class="price">{{ product.sale_price }}MAD</span>
+                      <span class="text-decoration-line-through text-muted">{{ product.regular_price }}MAD</span>
+                    </div>
                   </router-link>
                   <div class="wcf-right"><a data-toggle="modal" data-target="#exampleModal3"
                       @click="getProduct(product.slug)" class="buy-btn"> Add to cart</a></div>
@@ -211,21 +211,21 @@
             <div class="item">
 
               <div class="thumb-wrapper">
-                   <router-link :to="{ name: 'product', params: { slug: product.slug } }">
+                <router-link :to="{ name: 'product', params: { slug: product.slug } }">
 
-                <div class="img-box">
-                  <img :src="'storage/products/' + product.image" class="img-fluid" alt="">
-                </div>
+                  <div class="img-box">
+                    <img :src="'storage/images/' + product.image" class="img-fluid" alt="">
+                  </div>
                 </router-link>
 
                 <div class="thumb-content">
                   <router-link :to="{ name: 'product', params: { slug: product.slug } }">
 
-                  <h4>{{ product.name }}</h4>
+                    <h4>{{ product.name }}</h4>
 
-                  <p class="item-price"><strike>{{ product.regular_price }} MAD</strike> <b>{{ product.sale_price }}
-                      MAD</b>
-                  </p>
+                    <p class="item-price"><strike>{{ product.regular_price }} MAD</strike> <b>{{ product.sale_price }}
+                        MAD</b>
+                    </p>
                   </router-link>
                   <a data-toggle="modal" data-target="#exampleModal3" @click="getProduct(product.slug)"
                     class="btn btn-primary">Add to Cart</a>
@@ -252,7 +252,7 @@
           </div>
           <div class="modal-body">
             <div class="product-image float-left mx-4">
-              <img height="200px" width="200px" :src="'storage/products/' + this.product.image">
+              <img height="200px" width="200px" :src="'storage/images/' + this.product.image">
 
             </div>
             <div class="product-content">
@@ -263,7 +263,7 @@
               <br>
               <span class="price">{{ this.total > 0 ? this.total : this.product.sale_price }} MAD</span>
 
-              <div class="form-inline attributes">
+              <div class="form-inline attributes" v-if="attributes">
                 <label v-for="(attr, index) in attributes.attribute" :key="index">{{ attr }}:
                   <select name="attributes" @change="selectAttribute(index)" v-model="selected[index]"
                     class="form-control ml-2">
@@ -280,7 +280,7 @@
                 <div class="input-group-prepend">
                   <button class="btn btn-outline-info" @click="decrement" type="button">-</button>
                 </div>
-                <input class="form-control"  disabled v-model="cart.quantity" type="number" max="10" min="1">
+                <input class="form-control" disabled v-model="cart.quantity" type="number" max="10" min="1">
                 <div class="input-group-append">
                   <button class="btn btn-outline-info" @click="increment" type="button">+</button>
                 </div>
@@ -306,6 +306,7 @@ import 'vue-slick-carousel/dist/vue-slick-carousel.css'
 // optional style for arrows & dots
 import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
 import { Carousel, Slide } from 'vue-carousel';
+import cartMixin from '../mixins/cart';
 
 export default {
   components: {
@@ -313,6 +314,8 @@ export default {
     Carousel,
     Slide
   },
+  name: 'Home',
+  mixins: [cartMixin],
   data() {
     return {
       featured: {},
@@ -337,11 +340,8 @@ export default {
       myprice: '',
       selected: [],
       options: [],
-      collect: [],
       total: 0,
-      price: 0,
       alreadyExisted: false,
-      total_price: 0,
       carts: [],
     }
   },
@@ -361,37 +361,15 @@ export default {
         this.best_selling = res.data.best_selling;
       })
     },
-    increment() {
-      this.cart.quantity++;
-    },
-    decrement() {
-      this.cart.quantity > 1 ? this.cart.quantity-- : this.cart.quantity;
-    },
-    selectAttribute(index) {
-      this.total = 0;
-      this.price = parseInt(this.selected[index].myprice);
-      this.options[index] = this.selected[index].myvalue;
-      this.collect[index] = this.price;
-      for (let i = 0; i < this.collect.length; i++) {
-        this.total = this.total + this.collect[i];
-      }
-      this.total = this.total + this.product.sale_price;
-
-    },
     getProduct(slug) {
-      axios.get('/api/products/' + slug)
-        .then(res => {
-          this.product = res.data.product;
-          this.attributes = res.data.attributes;
-        }).catch(error => console.log(error));
-
-    },
-    addToCart() {
-      cartHelper.addToCart(this.cart, this.options, this.product);
-      let carts = JSON.parse(localStorage.getItem("cart"));
-      this.$emit('cart', carts);
-    },
-  
+            axios
+                .get("/api/show/product/" + slug)
+                .then((res) => {
+                    this.product = res.data.product;
+                    this.attributes = res.data.attributes;
+                })
+                .catch((error) => console.log(error));
+        },
   },
 
   mounted() {

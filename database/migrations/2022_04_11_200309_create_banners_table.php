@@ -17,7 +17,7 @@ class CreateBannersTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('link')->nullable();
-            $table->string('picture');
+            $table->string('image');
             $table->bigInteger('order');
             $table->timestamps();
         });

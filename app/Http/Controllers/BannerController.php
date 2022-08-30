@@ -2,19 +2,30 @@
 
 namespace App\Http\Controllers;
 
+/*Traits */
+use App\Traits\UploadTrait;
+
+/*Requests */
 use Illuminate\Http\Request;
-use App\Http\Resources\BannerCollection;
-use App\Http\Resources\BannerResource;
 use App\Http\Requests\StoreBannerRequest;
 
+/*Collections & Resources */
+use App\Http\Resources\BannerCollection;
+use App\Http\Resources\BannerResource;
+
+/*Models */
 use App\Models\Banner;
+
+/*Helpers */
 use Carbon\Carbon;
 use Image;
+
+
 class BannerController extends Controller
 {
-    public function __construct() {
-        $this->middleware(['auth:sanctum','admin'])->except(['index']);
-      }
+
+    use UploadTrait;
+  
     /**
      * Display a listing of the resource.
      *
@@ -26,15 +37,6 @@ class BannerController extends Controller
         return new BannerCollection($banners);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -45,14 +47,9 @@ class BannerController extends Controller
     public function store(StoreBannerRequest $request)
     {
         
-        $picture = Carbon::now()->timestamp.'.'.$request->picture->extension();
+        $picture = $this->upload($request);
 
-        $request->picture->move(public_path('storage/banners'), $picture);
-      if($request->order > 10){
-          return response()->json([
-              'message' => "there's only 9 banners"
-          ]);
-      }
+     
         $banner = Banner::create([
             "title" => $request->title,
             "link" => $request->link,
@@ -79,9 +76,6 @@ class BannerController extends Controller
       
     ]);
 
-        
-        
-
     }
     public function goDown(Banner $banner)
     {
@@ -99,9 +93,6 @@ class BannerController extends Controller
       
     ]);
 
-        
-        
-
     }
 
     /**
@@ -116,17 +107,6 @@ class BannerController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -135,13 +115,10 @@ class BannerController extends Controller
      */
     public function update(Request $request, Banner $banner)
     {
-        $imageName = $banner->picture;
         
        
         if($request->file('picture')){
-        $imageName = Carbon::now()->timestamp.'.'. $request->picture->extension();
-        
-        $request->picture->move(public_path('banners'), $imageName);
+            $imageName = $this->upload($request);
      
         }
         $banner->update([
@@ -158,11 +135,12 @@ class BannerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  @param  \App\Models\Banner  $banner
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Banner $banner)
     {
-        //
+        $banner->delete();
+        $this->deleteimage($banner->picture);
     }
 }

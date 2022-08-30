@@ -2,27 +2,42 @@
 
 namespace App\Http\Controllers;
 
+/*Traits */
+use App\Traits\UploadTrait;
+
+/*Requests */
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+
+/*Collections & Resources */
 use App\Http\Resources\AttributeCollection;
 use App\Http\Resources\AttributeValueCollection;
 use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\ProductCollection;
-use App\Http\Resources\ProductResource;
 use App\Http\Resources\SubcategoryCollection;
+use App\Http\Resources\ProductResource;
+
+/*Models */
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\Gallery;
 use App\Models\Product;
 use App\Models\Subcategory;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+
+/*Services */
+use App\Services\AttributeService;
+use App\Services\GalleryService;
+
+/*Helpers */
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 use Image;
 
 class ProductController extends Controller
 {
+    use UploadTrait;
     /**
      * Display a listing of the resource.
      *
@@ -35,20 +50,24 @@ class ProductController extends Controller
         if (request('filterBy') == 0) {
             $sort_field = 'created_at';
             $sort_direction = 'DESC';
-        } elseif (request('filterBy') == 1) {
+        } 
+        elseif (request('filterBy') == 1) {
             $sort_field = 'created_at';
             $sort_direction = 'ASC';
-        } elseif (request('filterBy') == 2) {
-
-            $products = Product::withCount('order')->orderBy('order_count', 'desc')
-                ->where('name', 'LIKE', '%' . $search . '%')
-                ->when($category, function ($query, $category) {
-                    $query->where('category_id', $category);
-                })->paginate(10);
-        } elseif (request('filterBy') == 3) {
+        } 
+        elseif (request('filterBy') == 2) {
+            $products = Product::withCount('order')
+            ->orderBy('order_count', 'desc')
+            ->where('name', 'LIKE', '%' . $search . '%')
+            ->when($category, function ($query, $category) {
+                $query->where('category_id', $category);
+            })->paginate(10);
+        } 
+        elseif (request('filterBy') == 3) {
             $sort_field = 'sale_price';
             $sort_direction = 'ASC';
-        } elseif (request('filterBy') == 4) {
+        }
+         elseif (request('filterBy') == 4) {
             $sort_field = 'sale_price';
             $sort_direction = 'DESC';
         }
@@ -70,26 +89,15 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreProductRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request, GalleryService $galleryService, AttributeService $attributeService)
     {
-        $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
-        $location = public_path('storage/products/' . $imageName);
-        Image::make($request->image)->resize(600, 600)->save($location);
+
+        $imageName = $this->upload($request);
 
         $product = Product::create([
             'category_id' => $request->category,
@@ -107,43 +115,11 @@ class ProductController extends Controller
         ]);
 
         if ($request->gallery) {
-            $imgsName = "";
-            foreach ($request->gallery as $key => $image) {
-                $imgName = Carbon::now()->timestamp . $key . '.' . $image->extension();
-
-                $location = public_path('storage/products/' . $imgName);
-                Image::make($image)->resize(600, 600)->save($location);
-
-                if ($key == 0) {
-                    $imgsName = $imgName;
-                }
-                $gallery = Gallery::create([
-                    'product_id' => $product->id,
-                    'image' => $imgName,
-                ]);
-            }
+            $galleryService->store($request, $product->id);
         }
 
         if ($request->attrs) {
-            $attrs = explode(',', $request->attrs);
-            $values = json_decode($request->values);
-            $prices = json_decode($request->prices);
-
-            foreach ($attrs as $key => $myattr) {
-
-                $prod_attr = Attribute::where('name', $myattr)->first()->id;
-
-                foreach ($values[$key] as $k => $value) {
-
-                    $attribute = AttributeValue::create([
-                        'product_id' => $product->id,
-                        'attribute_id' => $prod_attr,
-                        'value' => $value,
-                        'price_variation' => $prices[$key][$k],
-
-                    ]);
-                }
-            }
+            $attributeService->store($request, $product->id);
         }
 
         return response([
@@ -170,32 +146,17 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-    }
-
-    /**
-     * Update the specified resource in storage.
+      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateProductRequest  $request
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, GalleryService $galleryService,  AttributeService $attributeService,  Product $product)
     {
-        $imageName = $product->image;
-        $path = public_path() . '/storage/products';
 
         if ($request->file('image')) {
-            $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
-            $location = public_path('storage/products/' . $imageName);
-            Image::make($request->image)->resize(600, 600)->save($location);
-
+            $imageName = $this->upload($request);
         }
         $product->update([
             'category_id' => $request->category,
@@ -213,43 +174,11 @@ class ProductController extends Controller
         ]);
 
         if ($request->file('gallery')) {
-            $imgsName = "";
-            foreach ($request->gallery as $key => $image) {
-                $imgName = Carbon::now()->timestamp . $key . '.' . $image->extension();
-
-                $location = public_path('storage/products/' . $imgName);
-                Image::make($image)->resize(600, 600)->save($location);
-
-
-                if ($key == 0) {
-                    $imgsName = $imgName;
-                }
-                $gallery = Gallery::create([
-                    'product_id' => $product->id,
-                    'image' => $imgName,
-                ]);
-            }
+            $galleryService->store($request, $id);
         }
 
         if ($request->attrs) {
-            $attrs = explode(',', $request->attrs);
-            $values = json_decode($request->values);
-            $prices = json_decode($request->prices);
-            $attribute = AttributeValue::where('product_id', $product->id)->delete();
-
-            foreach ($attrs as $key => $myattr) {
-
-                $prod_attr = Attribute::where('name', $myattr)->first()->id;
-                foreach ($values[$key] as $k => $value) {
-
-                    AttributeValue::create([
-                        'product_id' => $product->id,
-                        'attribute_id' => $prod_attr,
-                        'value' => $value,
-                        'price_variation' => $prices[$key][$k],
-                    ]);
-                }
-            }
+            $attributeService->store($request, $id);
         }
 
         return response()->json(['status' => 201]);
@@ -261,30 +190,21 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy(Product $product , GalleryService $galleryService , AttributeService $attributeService)
     {
-
-        $attrs = AttributeValue::where('product_id', $product->id)->get();
-        $gallery = Gallery::where('product_id', $product->id)->get();
         $product->delete();
-        $product->forcedelete();
-        $product->deleteimage();
-        if ($attrs) {
-            foreach ($attrs as $attr) {
-                $attr->delete();
-            }
-        }
-        if ($gallery) {
-            foreach ($gallery as $img) {
-                $img->delete();
-            }
-        }
+        $this->deleteimage($product->image);
+
+        $galleryService->delete($product->id);
+        $attributeService->delete($product->id);
+
         return response()->json(['status' => 201]);
     }
     public function removeImage($id)
     {
         $gallery = Gallery::find($id);
         $gallery->delete();
+        Storage::delete('/images/' . $gallery);
         return response()->json(['status' => 201]);
     }
 }

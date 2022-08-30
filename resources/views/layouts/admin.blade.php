@@ -18,7 +18,7 @@
       <link rel="stylesheet" href="{{mix('css/admin.css')}}">
    </head>
      
-   @if (Auth::check())
+   {{-- @if (Auth::check())
         <script>
             console.log('logged');
            window.Laravel = {!!json_encode([
@@ -47,7 +47,7 @@
             ])!!}
             window.location.href = "/home"
         </script>
-    @endif
+    @endif --}}
    <body class="antialiased">
    
     <div id="admin">

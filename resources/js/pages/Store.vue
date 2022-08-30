@@ -92,7 +92,7 @@
 
 								<div class="product">
 									<div class="product-img">
-										<img :src="'/storage/products/' + product.image" alt="">
+										<img :src="'/storage/images/' + product.image" alt="">
 
 									</div>
 
@@ -109,8 +109,9 @@
 											<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
 													class="tooltipp">add to wishlist</span></button>
 											<button class="quick-view">
-												<router-link :to="{ name: 'product', params: { slug: product.slug } }"><i
-														class="fa fa-eye"></i></router-link><span class="tooltipp">
+												<router-link :to="{ name: 'product', params: { slug: product.slug } }">
+													<i class="fa fa-eye"></i>
+												</router-link><span class="tooltipp">
 													view</span>
 											</button>
 										</div>
@@ -138,7 +139,7 @@
 										<div class="modal-body">
 											<div class="product-image float-left mx-4">
 												<img height="200px" width="200px"
-													:src="'/storage/products/' + this.product.image">
+													:src="'/storage/images/' + this.product.image">
 
 											</div>
 											<div class="product-content">
@@ -153,8 +154,9 @@
 												}} MAD</span>
 
 												<div class="form-inline attributes">
-													<label v-for="(attr, index) in attributes.attribute"
-														:key="index">{{ attr }}:
+													<label v-for="(attr, index) in attributes.attribute" :key="index">{{
+															attr
+													}}:
 														<select name="attributes" @change="selectAttribute(index)"
 															v-model="selected[index]" class="form-control ml-2">
 															<option v-for="(value, ind) in attributes.values[index]"
@@ -218,27 +220,25 @@
 </template>
 <script>
 import LaravelVuePagination from 'laravel-vue-pagination';
+import cartMixin from '../mixins/cart';
 
 
 export default {
 	components: {
 		'Pagination': LaravelVuePagination
-
 	},
 
 	name: "store",
+	mixins: [cartMixin],
 
 	data() {
 		return {
 			cart: { id: '', slug: '', product: '', price: '', quantity: 1, attributes: '', shipping_fee: '' },
-			total_price: 0,
 			carts: [],
 			sortby: 0,
-			alreadyExisted: false,
 			products: {},
 			total: 0,
-			price: 0,
-			product: { id: '', category: '', subcategory: '', name: '', slug: '', short_description: '', description: '', regular_price: '', sale_price: '', image: null, shipping_fee: '', status: '' },
+			product: { id: '', category: '', subcategory: '', name: '', slug: '', short_description: '', description: '', regular_price: '', sale_price: '', image: null, shipping_fee: '', },
 			attributes: { values: '', prices: '' },
 			categories: {},
 			subcategories: {},
@@ -246,45 +246,22 @@ export default {
 			myprice: '',
 			selected: [],
 			options: [],
-			collect: [],
 			selectedCategories: [],
 			selectedSubcategories: [],
 
 		}
 	},
 	methods: {
-		increment() {
-			this.cart.quantity++;
-		},
-		decrement() {
-
-			this.cart.quantity > 1 ? this.cart.quantity-- : this.cart.quantity;
-		},
-		selectAttribute(index) {
-			this.total = 0;
-			this.price = parseInt(this.selected[index].myprice);
-			this.options[index] = this.selected[index].myvalue;
-			this.collect[index] = this.price;
-			for (let i = 0; i < this.collect.length; i++) {
-				this.total = this.total + this.collect[i];
-			}
-			this.total = this.total + this.product.sale_price;
-
-		},
+	
 		getProduct(slug) {
-			axios.get('/api/products/' + slug)
+			axios.get('/api/show/product/' + slug)
 				.then(res => {
 					this.product = res.data.product;
 					this.attributes = res.data.attributes;
 				}).catch(error => console.log(error));
 
 		},
-		addToCart() {
-			cartHelper.addToCart(this.cart, this.options, this.product);
-			let carts = JSON.parse(localStorage.getItem("cart"));
-			this.$emit('cart', carts);
-		},
-
+		
 		loadCategories() {
 			axios.get('/api/browse/categories').then(res => {
 				this.categories = res.data.categories;
@@ -314,9 +291,6 @@ export default {
 		sortby: function () {
 			this.loadProducts();
 		},
-
-
-
 	},
 	mounted() {
 		this.loadCategories();

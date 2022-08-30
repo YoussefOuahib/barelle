@@ -82,7 +82,7 @@
 						</div>
 						<div class="payment-method">
 							<div class="input-radio">
-								<input type="radio" v-model="order.payment" value="Direct Bank Transfert" name="payment" id="payment-1">
+								<input type="radio" v-model="order.payment" value="direct_bank_transfert" name="payment" id="payment-1">
 								<label for="payment-1">
 									<span></span>
 									Direct Bank Transfer
@@ -92,7 +92,7 @@
 								</div>
 							</div>
 							<div class="input-radio">
-								<input type="radio" v-model="order.payment" value="Cash On delivery" name="payment" id="payment-2">
+								<input type="radio" v-model="order.payment" value="cod" name="payment" id="payment-2">
 								<label for="payment-2">
 									<span></span>
 									Cash On Delivery
@@ -102,10 +102,10 @@
 								</div>
 							</div>
 							<div class="input-radio">
-								<input type="radio" v-model="order.payment" value="PAYPAL" name="payment" id="payment-3">
+								<input type="radio" v-model="order.payment" value="paypal" name="payment" id="payment-3">
 								<label for="payment-3">
 									<span></span>
-									Paypal System
+									Paypal
 								</label>
 								<div class="caption">
 									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>

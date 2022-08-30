@@ -2,14 +2,26 @@
 
 namespace App\Http\Controllers;
 
+/*Traits */
+use App\Traits\UploadTrait;
+
+/*Requests */
 use Illuminate\Http\Request;
+
+/*Collections & Resources */
 use App\Http\Resources\SliderCollection;
 use App\Http\Resources\SliderResource;
+
+/*Models */
 use App\Models\Slider;
+
+/*Helpers */
 use Carbon\Carbon;
 use Image;
+
 class SliderController extends Controller
 {
+    use UploadTrait;
     /**
      * Display a listing of the resource.
      *
@@ -22,17 +34,6 @@ class SliderController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -40,15 +41,12 @@ class SliderController extends Controller
      */
     public function store(Request $request)
     {
-        $picture = Carbon::now()->timestamp.'.'.$request->picture->extension();
-                
+        $imageName = $this->upload($request);
 
-        $request->picture->move(public_path('storage/sliders'), $picture);
-      
         $slider = Slider::create([
             "title" => $request->title,
             "link" => $request->link,
-            "picture" => $picture,
+            "picture" => $imageName,
            
         ]);
         return (new SliderResource($slider))->additional([
@@ -71,17 +69,6 @@ class SliderController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -90,13 +77,9 @@ class SliderController extends Controller
      */
     public function update(Request $request, Slider $slider)
     {
-        $imageName = $slider->picture;
        
         if($request->file('picture')){
-        $imageName = Carbon::now()->timestamp.'.'. $request->picture->extension();
-
-        $request->picture->move(public_path('sliders'), $imageName);
-     
+            $imageName = $this->upload($request);
         }
         $slider->update([
             "title" => $request->title,
@@ -110,11 +93,14 @@ class SliderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Slider  $slider
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Slider $slider)
     {
-        //
+        $slider->delete();
+        $this->deleteimage($slider->picture);
+
+
     }
 }

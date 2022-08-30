@@ -41,6 +41,25 @@ class Order extends Model
     {
         return $this->belongsToMany('App\Models\Product', 'order_product')->withPivot('quantity','price','attributes');
     }
+    /**
+    
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+    public function scopePaid($query) 
+    {
+        return $query->where('is_paid', 'yes');
+    }
+    public function getPaymentAttribute($value)
+    {
+        $replaced = str_replace('_', ' ', $value);
+        return $replaced;
+    }
     
 
 }

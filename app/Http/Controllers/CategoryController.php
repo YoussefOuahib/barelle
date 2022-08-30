@@ -2,16 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+/*Traits */
+use App\Traits\UploadTrait;
+
+/*Requests */
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+
+/*Collection & Resources */
 use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\CategoryResource;
+
+/* Models */
+use App\Models\Category;
+
+/* Helpers */
 use Image;
 use Carbon\Carbon;
 
 class CategoryController extends Controller
 {
+    use UploadTrait;
     /**
      * Display a listing of the resource.
      *
@@ -24,30 +35,10 @@ class CategoryController extends Controller
         return (new CategoryCollection($categories));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreCategoryRequest  $request
-     * @return \Illuminate\Http\Response
-     */
+   
     public function store(StoreCategoryRequest $request)
     {
-        $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
-        /*
-        $location = public_path('storage/products/' . $imageName);
-        Image::make($request->image)->resize(600,600)->save($location);
-*/
-        $request->image->move(public_path('/storage/products'), $imageName);
+        $imageName = $this->upload($request);
         $category = Category::create([
             'name' => $request->name,
             'image' => $imageName,
@@ -68,16 +59,7 @@ class CategoryController extends Controller
         return new CategoryResource($category);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
+    
 
     /**
      * Update the specified resource in storage.
@@ -89,11 +71,8 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, Category $category)
     {
 
-
         if ($request->file('image')) {
-            $imageName = Carbon::now()->timestamp . '.' . $request->image->extension();
-
-            $request->image->move(public_path('products'), $imageName);
+            $imageName = $this->upload($request);
         }
         $category->update([
             'image' => $imageName,
@@ -112,9 +91,10 @@ class CategoryController extends Controller
     {
         if ($category->subcategories->count() == 0) {
             $category->delete();
+            $this->deleteimage($category->image);
             return response()->json(['status' => 201]);
         } else {
-            return response()->json(['status' => 301]);
+            return response()->json(['status' => 403]);
         }
     }
 }

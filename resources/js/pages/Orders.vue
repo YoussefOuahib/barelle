@@ -10,19 +10,19 @@
             <label for="payment">Payment:</label>
             <select v-model="payment" name="payment" class="selectform">
               <option value="">All</option>
-              <option value="Cash On delivery">Cash on delivery</option>
-              <option value="Direct Bank Transfert">Direct Bank Transfert</option>
-              <option value="PAYPAL">PAYPAL</option>
+              <option value="cod">Cash on delivery</option>
+              <option value="direct_bank_transfert">Direct Bank Transfert</option>
+              <option value="paypal">PAYPAL</option>
 
             </select>
             <label for="status">Status:</label>
             <select v-model="status" name="status" class="selectform">
               <option value="">All</option>
-              <option value="Pending">Pending</option>
-              <option value="Confirmed">Confirmed</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Canceled">Canceled</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="canceled">Canceled</option>
 
             </select>
           </div>
@@ -70,7 +70,6 @@
           </table>
         </div>
         <div class="pagination">
-          <Pagination :data="orders" @pagination-change-page="getOrders" />
         </div>
       </div>
     </main>
@@ -152,7 +151,7 @@
               <tbody>
                 <tr v-for="(product, index) in order.products" :key="index">
                   <td><img height="100px" width="100px" style="border-radius: 20px; margin: 0 auto;"
-                      :src="'storage/products/' + product.image"></td>
+                      :src="'/storage/images/' + product.image"></td>
                   <td>{{ product.name }}</td>
                   <td>{{ product.price[index] }}</td>
                   <td>{{ product.attributes[index] }}</td>
@@ -208,9 +207,6 @@ export default {
         this.filterTotalUp = true;
         this.filterTotalDown = null;
         this.filterTotal = 0;
-
-
-
       }
       else if (this.filterTotalUp) {
         this.filterTotalUp = null;
@@ -225,15 +221,13 @@ export default {
       this.getOrders();
     },
     getOrders(page = 1) {
-
+      
       axios.get('/api/admin/orders?page=' + page
         + '&status=' + this.status
         + '&payment=' + this.payment
         + '&filterTotal=' + this.filterTotal
       ).then(res => {
         this.orders = res.data;
-        console.log('hello total');
-        console.log(this.filterTotal);
       }).catch(err => console.log(err));
     },
     getOrder(id) {
@@ -244,16 +238,12 @@ export default {
           this.order = res.data.data;
         }).catch(error => console.log(error));
     },
-
-
-
     updateOrder() {
       const config = {
         headers: {
           'content-type': 'multipart/form-data'
         }
       }
-      console.log(this.order.is_paid);
       let formData = new FormData();
       formData.append('status', this.order.status);
       formData.append('is_paid', this.order.is_paid);

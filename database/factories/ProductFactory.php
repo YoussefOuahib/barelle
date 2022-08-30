@@ -26,7 +26,7 @@ class ProductFactory extends Factory
             'shipping_fee' => $this->faker->randomNumber(2),
             'category_id' => 1,
             'subcategory_id' => 1, //$this->faker->numberBetween(1,10),
-            'image' => $this->faker->image('public/storage/products',640,600, null, false),
+            'image' => $this->faker->image('public/images/',640,600, null, false),
 
 
 

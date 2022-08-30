@@ -3236,8 +3236,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'admin',
   data: function data() {
@@ -3367,6 +3365,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'analytics',
@@ -3385,7 +3384,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     getAnalytics: function getAnalytics() {
       var _this = this;
 
-      console.log('hello mtf');
       axios.get('/api/analytics').then(function (res) {
         /* start of tracking orders*/
         var arr1 = [];
@@ -3400,6 +3398,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         _this.orderData = arr1.reduce(function (accumulator, element, index) {
           return _objectSpread(_objectSpread({}, accumulator), {}, _defineProperty({}, element, arr2[index]));
         }, {});
+        console.log(_this.orderData);
         /* end of tracking orders */
 
         /* start of order status */
@@ -3414,13 +3413,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         while (stt1.length) {
           _this.statusData.push(stt1.splice(0, 2));
         }
+
+        console.log(_this.statusData);
         /* end of order status */
 
         /* start of products */
 
-
         _this.products = res.data.products;
-        console.log(_this.products);
         var prr1 = [];
 
         for (var _x2 in _this.status) {
@@ -4616,7 +4615,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -4664,8 +4662,6 @@ __webpack_require__.r(__webpack_exports__);
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       axios.get('/api/admin/orders?page=' + page + '&status=' + this.status + '&payment=' + this.payment + '&filterTotal=' + this.filterTotal).then(function (res) {
         _this.orders = res.data;
-        console.log('hello total');
-        console.log(_this.filterTotal);
       })["catch"](function (err) {
         return console.log(err);
       });
@@ -4688,7 +4684,6 @@ __webpack_require__.r(__webpack_exports__);
           'content-type': 'multipart/form-data'
         }
       };
-      console.log(this.order.is_paid);
       var formData = new FormData();
       formData.append('status', this.order.status);
       formData.append('is_paid', this.order.is_paid);
@@ -5362,7 +5357,6 @@ __webpack_require__.r(__webpack_exports__);
         _this2.products = res.data;
         _this2.categories = res.data.categories;
         _this2.attributes = res.data.attributes;
-        console.log(_this2.categories);
       })["catch"](function (err) {
         return console.log(err);
       });
@@ -5378,7 +5372,6 @@ __webpack_require__.r(__webpack_exports__);
         _this3.prv = _this3.product.image;
         _this3.gallery = res.data.gallery;
         _this3.atts = res.data.attributes;
-        console.log(_this3.atts.attribute.toString());
 
         _this3.handleAttributes();
       })["catch"](function (error) {
@@ -5560,6 +5553,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _assets_images_placeholder_jpg__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../assets/images/placeholder.jpg */ "./resources/js/assets/images/placeholder.jpg");
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -86204,8 +86204,6 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "logo" }, [
-      _c("img", { attrs: { src: "", alt: "logo" } }),
-      _vm._v(" "),
       _c("h2", [
         _vm._v("PA"),
         _c("span", { staticClass: "danger" }, [_vm._v("PPY ")]),
@@ -86228,9 +86226,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "profile" }, [
       _c("div", { staticClass: "info" }, [
-        _c("p", [_vm._v("Hey, "), _c("b", [_vm._v("Daniel")])]),
-        _vm._v(" "),
-        _c("small", { staticClass: "text-muted" }, [_vm._v("Admin")]),
+        _c("p", [_vm._v("Hey, "), _c("b", [_vm._v("Admin")])]),
       ]),
     ])
   },
@@ -87480,7 +87476,7 @@ var render = function () {
                       attrs: {
                         width: "100px",
                         height: "100px",
-                        src: "/storage/products/" + category.image,
+                        src: "/storage/images/" + category.image,
                         alt: "",
                       },
                     }),
@@ -88017,15 +88013,15 @@ var render = function () {
               [
                 _c("option", { attrs: { value: "" } }, [_vm._v("All")]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Cash On delivery" } }, [
+                _c("option", { attrs: { value: "cod" } }, [
                   _vm._v("Cash on delivery"),
                 ]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Direct Bank Transfert" } }, [
+                _c("option", { attrs: { value: "direct_bank_transfert" } }, [
                   _vm._v("Direct Bank Transfert"),
                 ]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "PAYPAL" } }, [
+                _c("option", { attrs: { value: "paypal" } }, [
                   _vm._v("PAYPAL"),
                 ]),
               ]
@@ -88065,23 +88061,23 @@ var render = function () {
               [
                 _c("option", { attrs: { value: "" } }, [_vm._v("All")]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Pending" } }, [
+                _c("option", { attrs: { value: "pending" } }, [
                   _vm._v("Pending"),
                 ]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Confirmed" } }, [
+                _c("option", { attrs: { value: "confirmed" } }, [
                   _vm._v("Confirmed"),
                 ]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Shipped" } }, [
+                _c("option", { attrs: { value: "shipped" } }, [
                   _vm._v("Shipped"),
                 ]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Delivered" } }, [
+                _c("option", { attrs: { value: "delivered" } }, [
                   _vm._v("Delivered"),
                 ]),
                 _vm._v(" "),
-                _c("option", { attrs: { value: "Canceled" } }, [
+                _c("option", { attrs: { value: "canceled" } }, [
                   _vm._v("Canceled"),
                 ]),
               ]
@@ -88162,17 +88158,7 @@ var render = function () {
           ]),
         ]),
         _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "pagination" },
-          [
-            _c("Pagination", {
-              attrs: { data: _vm.orders },
-              on: { "pagination-change-page": _vm.getOrders },
-            }),
-          ],
-          1
-        ),
+        _c("div", { staticClass: "pagination" }),
       ]),
     ]),
     _vm._v(" "),
@@ -88424,7 +88410,7 @@ var render = function () {
                               attrs: {
                                 height: "100px",
                                 width: "100px",
-                                src: "storage/products/" + product.image,
+                                src: "/storage/images/" + product.image,
                               },
                             }),
                           ]),
@@ -89924,7 +89910,7 @@ var render = function () {
                                   margin: "0 auto",
                                 },
                                 attrs: {
-                                  src: "/storage/products/" + this.prv,
+                                  src: "/storage/images/" + this.prv,
                                   height: "150px",
                                   width: "150px",
                                 },
@@ -89984,7 +89970,7 @@ var render = function () {
                               _c("img", {
                                 staticStyle: { "border-radius": "10px" },
                                 attrs: {
-                                  src: "/storage/products/" + img.image,
+                                  src: "/storage/images/" + img.image,
                                   height: "70px",
                                   width: "70px",
                                 },
@@ -90561,7 +90547,7 @@ var render = function () {
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "myform" }, [
-        _c("label", { attrs: { for: "name" } }, [_vm._v("Google Maps Link")]),
+        _c("label", { attrs: { for: "map" } }, [_vm._v("Google Maps Link")]),
         _vm._v(" "),
         _c("div", [
           _c("input", {
@@ -90604,7 +90590,7 @@ var render = function () {
               _c("img", {
                 staticStyle: { cursor: "pointer", margin: "0 auto" },
                 attrs: {
-                  src: "/storage/products/" + this.previewImg,
+                  src: "/storage/images/" + this.previewImg,
                   height: "150px",
                   width: "150px",
                 },
@@ -90830,7 +90816,7 @@ var render = function () {
                       attrs: {
                         width: "100px",
                         height: "100px",
-                        src: "/storage/sliders/" + slider.picture,
+                        src: "/storage/images/" + slider.picture,
                         alt: "",
                       },
                     }),

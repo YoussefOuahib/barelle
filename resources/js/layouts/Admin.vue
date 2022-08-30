@@ -4,7 +4,6 @@
             <aside :class="seen == true ? 'seen' : 'unseen'" > 
                 <div class="top">
                     <div class="logo">
-                        <img src="" alt="logo">
                         <h2>PA<span class="danger">PPY </span></h2>
                     </div>
                     <div id="close-btn" @click="seen = false" class="close">
@@ -112,8 +111,7 @@
                 <div class="profile">
                     
                     <div class="info">
-                        <p>Hey, <b>Daniel</b></p>
-                        <small class="text-muted">Admin</small>
+                        <p>Hey, <b>Admin</b></p>
                     </div>
                     
                 </div>

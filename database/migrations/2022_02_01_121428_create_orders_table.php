@@ -23,9 +23,9 @@ class CreateOrdersTable extends Migration
             $table->string('email');
             $table->string('phone');
             $table->integer('item_count')->default(1);
-            $table->enum('is_paid',['Yes','No'])->default('No');
-            $table->enum('status',['Pending','Confirmed','Shipped','Delivered','Canceled'])->default('Pending');
-            $table->enum('payment', ['Direct Bank Transfert', 'Cash On delivery', 'PAYPAL']);
+            $table->enum('is_paid',['yes','no'])->default('no');
+            $table->enum('status',['pending','confirmed','shipped','delivered','canceled'])->default('pending');
+            $table->string('payment');
             $table->longText('note')->nullable();
             $table->float('total');
             $table->timestamps();

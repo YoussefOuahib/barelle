@@ -8,12 +8,10 @@ require('./bootstrap');
 
 window.Vue = require('vue').default;
 
-import cartHelper from './helpers/cartHelper'
 import router from './router.js';
 import VueSweetalert2 from 'vue-sweetalert2';
 import App from './layouts/App.vue';
 
-window.cartHelper = cartHelper
 
 
 /**

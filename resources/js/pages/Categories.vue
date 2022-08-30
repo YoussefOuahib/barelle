@@ -27,7 +27,7 @@
                 <td>
                   <small v-for="subcategory in category.subcategories"> {{ subcategory.name }}-</small>
                 </td>
-                <td class="banner-pic"><img width="100px" height="100px" :src="'/storage/products/' + category.image"
+                <td class="banner-pic"><img width="100px" height="100px" :src="'/storage/images/' + category.image"
                     alt=""></td>
 
                 <td>

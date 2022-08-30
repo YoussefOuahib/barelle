@@ -47,7 +47,7 @@
 
                 <div class="product">
                   <div class="product-img">
-                    <img :src="'/storage/products/' + product.image" alt="">
+                    <img :src="'/storage/images/' + product.image" alt="">
 
                   </div>
 
@@ -107,7 +107,7 @@
                 </div>
                 <div class="modal-body">
                   <div class="product-image float-left mx-4">
-                    <img height="200px" width="200px" :src="'/storage/products/' + this.product.image">
+                    <img height="200px" width="200px" :src="'/storage/images/' + this.product.image">
 
                   </div>
                   <div class="product-content">
@@ -161,6 +161,7 @@
 </template>
 <script>
 import LaravelVuePagination from 'laravel-vue-pagination';
+import cartMixin from '../../mixins/cart';
 
 
 export default {
@@ -168,9 +169,8 @@ export default {
     'Pagination': LaravelVuePagination
 
   },
-
   name: "browseBySubcategory",
-
+  mixins: [cartMixin],
   data() {
     return {
       sortby: 0,
@@ -178,70 +178,29 @@ export default {
       subcategories: [],
       products: {},
       cart: { id: '', slug: '', product: '', price: '', quantity: 1, attributes: '', shipping_fee: '' },
-      total_price: 0,
       carts: [],
-      alreadyExisted: false,
       total: 0,
-      price: 0,
       product: { id: '', category: '', subcategory: '', name: '', slug: '', short_description: '', description: '', regular_price: '', sale_price: '', image: null, shipping_fee: '', status: '' },
       attributes: { values: '', prices: '' },
       myvalue: '',
       myprice: '',
       selected: [],
       options: [],
-      collect: [],
 
 
     }
   },
   methods: {
-    increment() {
-      this.cart.quantity++;
-    },
-    decrement() {
-
-      this.cart.quantity > 1 ? this.cart.quantity-- : this.cart.quantity;
-    },
-    selectAttribute(index) {
-      this.total = 0;
-      this.price = parseInt(this.selected[index].myprice);
-      this.options[index] = this.selected[index].myvalue;
-
-      this.collect[index] = this.price;
-      for (let i = 0; i < this.collect.length; i++) {
-        this.total = this.total + this.collect[i];
-
-      }
-      this.total = this.total + this.product.sale_price;
-      console.log(this.total);
-
-
-
-
-    },
+ 
     getProduct(slug) {
 
-      axios.get('/api/products/' + slug)
+      axios.get('/api/show/product/' + slug)
         .then(res => {
-
           this.product = res.data.product;
           this.attributes = res.data.attributes;
           console.log(this.gallery);
-
-
-
-
-
-
         }).catch(error => console.log(error));
 
-    },
-
-
-    addToCart() {
-      cartHelper.addToCart(this.cart, this.options, this.product);
-      let carts = JSON.parse(localStorage.getItem("cart"));
-      this.$emit('cart', carts);
     },
 
     loadProducts(page = 1) {

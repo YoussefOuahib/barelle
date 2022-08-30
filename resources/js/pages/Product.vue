@@ -14,10 +14,10 @@
                 <div class="row">
                     <div class="col-lg-6 col-12">
                         <div>
-                            <img :src="'/storage/products/' + this.product.image" width="60%">
+                            <img :src="'/storage/images/' + this.product.image" width="60%">
                         </div>
                         <img v-for="(gal, index) in this.product.gallery" :key="index"
-                            :src="'/storage/products/' + gal.image" width="100px" height="100px">
+                            :src="'/storage/images/' + gal.image" width="100px" height="100px">
                     </div>
                     <div class="col-lg-6 col-12">
                         <div class="product-card">
@@ -94,7 +94,7 @@
                     <div v-for="prod in related.data" :key="prod.id" class="col-lg-3 col-md-6 col-sm-6 col-12">
                         <div class="wsk-cp-product">
                             <div class="wsk-cp-img">
-                                <img :src="'/storage/products/' + prod.image" class="img-responsive" />
+                                <img :src="'/storage/images/' + prod.image" class="img-responsive" />
                             </div>
                             <div class="wsk-cp-text">
                                 <div class="category">
@@ -120,10 +120,13 @@
 import VueSlickCarousel from 'vue-slick-carousel'
 import 'vue-slick-carousel/dist/vue-slick-carousel.css'
 import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
-import cartHelper from '../helpers/cartHelper'
+import cartMixin from '../mixins/cart';
+
 export default {
   components: { VueSlickCarousel },
   name: 'product',
+  mixins: [cartMixin],
+
   data() {
     return {
       cart: { id: '', slug: '', product: '', price: '', quantity: 1, attributes: '', shipping_fee: '' },
@@ -176,11 +179,7 @@ export default {
           this.attributes = res.data.attributes;
         }).catch(error => console.log(error));
     },
-    addToCart() {
-      cartHelper.addToCart(this.cart, this.options, this.product);
-      let carts = JSON.parse(localStorage.getItem("cart"));
-      this.$emit('cart', carts);
-    },
+   
     getRelatedProducts() {
       axios.get(`/api/show/related/${this.$route.params.slug}`).then(res => {
         this.related = res.data;

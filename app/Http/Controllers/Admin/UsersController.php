@@ -17,10 +17,7 @@ class UsersController extends Controller
 
 
     }
-    public function update(Request $request, User $user)
-    {
-        
-    }
+  
     public function show(User $user) {
         return new UserResource($user);
     }

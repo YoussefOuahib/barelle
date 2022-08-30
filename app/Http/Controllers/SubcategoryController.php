@@ -1,19 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Category;
-use App\Models\Subcategory;
+
+/*Requests */
 use Illuminate\Http\Request;
+
+/*Resources & Collections */
 use App\Http\Resources\SubcategoryCollection;
 use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\SubcategoryResource;
+/* Models */ 
+use App\Models\Category;
+use App\Models\Subcategory;
+
 
 class SubcategoryController extends Controller
 {
-    public function __construct() {
-        $this->middleware('auth:sanctum')->except(['index','show']);
-      }
+   
     /**
      * Display a listing of the resource.
      *
@@ -37,16 +41,8 @@ class SubcategoryController extends Controller
         ], 201);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
+  
+   
     /**
      * Store a newly created resource in storage.
      *
@@ -55,8 +51,6 @@ class SubcategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $categories = Category::all();
-        if($categories){
         $subcategory = Subcategory::create([
             'name' => $request->name,
             'category_id' => $request->category_id
@@ -66,11 +60,9 @@ class SubcategoryController extends Controller
             'status' => 201
         ]);
     }
-    else {
-        return response()->json(['message' => 'You must add category first']);
-    }
+   
     
-    }
+    
 
     /**
      * Display the specified resource.
@@ -84,16 +76,7 @@ class SubcategoryController extends Controller
         return new SubcategoryResource($subcategory);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+  
 
     /**
      * Update the specified resource in storage.
@@ -118,8 +101,7 @@ class SubcategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Subcategory $subcategory)
-    {
-       
+    {       
         $subcategory->delete();
         return response()->json(['status' => 201]);
         

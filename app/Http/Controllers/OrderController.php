@@ -2,27 +2,39 @@
 
 namespace App\Http\Controllers;
 
+/*requests */
+use App\Http\Requests\StoreOrderRequest;
+
+/*Collections & Resources */
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
+
+/*Models */
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use App\Http\Requests\StoreOrderRequest;
-use App\Notifications\newOrder;
+
+/* Actions */
+use App\Actions\CreateOrder;
+
+/*Notifications */
+use App\Jobs\EmailNewOrder;
+
+/*Helpers */
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::paginate(5);
+        $orders = Order::paginate(10);
         return new OrderCollection($orders);
     }
     public function show(Order $order)
     {
         return new OrderResource($order);
     }
-    public function store(StoreOrderRequest $request)
+    public function store(StoreOrderRequest $request, CreateOrder $createOrder)
     {
         $order = Order::create([
             'user_id' => Auth::user()->id,
@@ -36,14 +48,11 @@ class OrderController extends Controller
             'payment' => $request->payment,
             'total' => $request->total,
             'note' => $request->note,
-
         ]);
-        $cart = json_decode($request->cart);
-        foreach ($cart as $item) {
-            $order->product()->attach($item->id, ['price' => $item->price, 'attributes' => $item->attributes, 'quantity' => $item->quantity]);
-        }
-        $user = User::where('role', 'admin')->get();
-        $user->notify(new newOrder($order));
+        $createOrder->execute($order, $request);
+        
+        dispatch(new EmailNewOrder($order));
+        
         return (new OrderResource($order))->additional([
             'status' => 201,
         ]);
